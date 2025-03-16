@@ -1,0 +1,10 @@
+{
+  "name": "benta925",
+  "version": "1.0.0",
+  "description": "Benta 925 full stack application",
+  "scripts": {
+    "backend:dev": "cd backend && npm run dev",
+    "frontend:dev": "cd frontend && npm run dev",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install"
+  }
+}
