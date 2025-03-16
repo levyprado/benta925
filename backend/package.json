@@ -1,0 +1,30 @@
+{
+  "name": "benta",
+  "version": "1.0.0",
+  "description": "backend for benta925",
+  "license": "ISC",
+  "author": "Levy Prado",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node --import=tsx --watch --env-file=.env src/app.ts"
+  },
+  "devDependencies": {
+    "@types/cookie-parser": "^1.4.8",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.13.10",
+    "prisma": "^6.5.0",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2"
+  },
+  "dependencies": {
+    "@oslojs/crypto": "^1.0.1",
+    "@oslojs/encoding": "^1.1.0",
+    "@prisma/client": "^6.5.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2"
+  }
+}
