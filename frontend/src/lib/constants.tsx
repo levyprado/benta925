@@ -6,8 +6,7 @@ import {
   TagIcon,
 } from "lucide-react";
 
-export const BASE_URL =
-  import.meta.env.BASE_URL || "https://benta925.onrender.com";
+export const BASE_URL = import.meta.env.BASE_URL || "http://localhost:5000";
 
 export const products = [
   {
