@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 
 export const BASE_URL =
-  import.meta.env.BASE_URL || "https://benta925.onrender.com";
+  import.meta.env.VITE_API_URL || "https://benta925.onrender.com";
 
 export const products = [
   {
