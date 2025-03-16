@@ -356,7 +356,7 @@ export default function ProductForm({ product, categories }: ProductFormProps) {
                         text: valor,
                       }))}
                       setTags={(tags) =>
-                        handleOptionValueChange(option.id, tags)
+                        handleOptionValueChange(option.id, tags as Tag[])
                       }
                       placeholder="Ex: Azul"
                       styleClasses={{
