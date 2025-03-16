@@ -9,7 +9,10 @@ export const userAuth = async (
   try {
     if (req.method !== "GET") {
       const origin = req.headers.origin;
-      if (origin === null || origin !== "http://localhost:5173") {
+      if (
+        origin === null ||
+        origin !== "https://voluble-brioche-e60359.netlify.app"
+      ) {
         res.status(403).json({ message: "Origem desconhecida" });
         return;
       }
