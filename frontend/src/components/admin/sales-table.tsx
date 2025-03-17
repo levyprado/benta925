@@ -31,7 +31,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import SearchInput from "./search-input";
 import { useMemo, useState } from "react";
 import { Sale } from "@/lib/types";
-import { formatDate } from "@/lib/utils";
+import { apiRequest, formatDate } from "@/lib/utils";
 import { useDeleteDialog } from "@/context/hooks/use-delete-dialog";
 import { BASE_URL } from "@/lib/constants";
 import { toast } from "sonner";
@@ -63,9 +63,8 @@ export default function SalesTable({ sales }: SalesTableProps) {
         </>
       ),
       onConfirm: async () => {
-        const res = await fetch(`${BASE_URL}/api/vendas/${sale.id}`, {
+        const res = await apiRequest(`${BASE_URL}/api/vendas/${sale.id}`, {
           method: "DELETE",
-          credentials: "include",
         });
         if (res.ok) {
           toast.success("Venda excluída com sucesso!");

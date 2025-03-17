@@ -70,6 +70,12 @@ function LoginPage() {
         credentials: "include",
       });
 
+      const data = await response.json();
+
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+      }
+
       if (response.ok) {
         toast.success("Login realizado com sucesso!");
       } else {

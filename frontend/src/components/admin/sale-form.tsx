@@ -21,7 +21,7 @@ import {
 } from "../ui/table";
 import SearchInput from "./search-input";
 import { useState } from "react";
-import { formatPrice } from "@/lib/utils";
+import { apiRequest, formatPrice } from "@/lib/utils";
 import { Link, useNavigate, useRouter } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { BASE_URL } from "@/lib/constants";
@@ -122,21 +122,13 @@ export default function SaleForm({ products, sale }: SaleFormProps) {
 
       let response;
       if (sale) {
-        response = await fetch(`${BASE_URL}/api/vendas/${sale.id}`, {
+        response = await apiRequest(`${BASE_URL}/api/vendas/${sale.id}`, {
           method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
           body: JSON.stringify(saleData),
         });
       } else {
-        response = await fetch(`${BASE_URL}/api/vendas`, {
+        response = await apiRequest(`${BASE_URL}/api/vendas`, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
           body: JSON.stringify(saleData),
         });
       }

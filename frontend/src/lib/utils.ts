@@ -21,3 +21,30 @@ export function formatDate(date: string | Date) {
     timeZone: "UTC",
   }).format(dateObj);
 }
+
+interface RequestOptions extends RequestInit {
+  headers?: Record<string, string>;
+}
+
+export const apiRequest = async (url: string, options: RequestOptions = {}) => {
+  const token = localStorage.getItem("authToken");
+
+  const defaultOptions: RequestInit = {
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    credentials: "include" as RequestCredentials,
+    ...options,
+  };
+
+  // Ensure headers are properly merged if provided in options
+  if (options.headers) {
+    defaultOptions.headers = {
+      ...defaultOptions.headers,
+      ...options.headers,
+    };
+  }
+
+  return fetch(url, defaultOptions);
+};

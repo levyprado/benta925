@@ -29,6 +29,7 @@ import {
 import { useDeleteDialog } from "@/context/hooks/use-delete-dialog";
 import { BASE_URL } from "@/lib/constants";
 import { toast } from "sonner";
+import { apiRequest } from "@/lib/utils";
 
 type CategoryWithProductCount = Category & {
   produtosCount: number;
@@ -56,11 +57,10 @@ export default function CategoriesTable({ categories }: CategoriesTableProps) {
         </>
       ),
       onConfirm: async () => {
-        const res = await fetch(
+        const res = await apiRequest(
           `${BASE_URL}/api/categorias/${category.id}/delete`,
           {
             method: "DELETE",
-            credentials: "include",
           }
         );
         if (res.ok) {

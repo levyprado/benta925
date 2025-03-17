@@ -3,7 +3,7 @@ import { Button, buttonVariants } from "../ui/button";
 import { Link } from "@tanstack/react-router";
 import { Dialog } from "@base-ui-components/react/dialog";
 import { BASE_URL, mobileMenuItems } from "@/lib/constants";
-import { cn } from "@/lib/utils";
+import { apiRequest, cn } from "@/lib/utils";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,9 +19,8 @@ export default function AdminHeader() {
   const { user } = useUser();
 
   const handleLogOut = async () => {
-    const response = await fetch(`${BASE_URL}/api/logout`, {
+    const response = await apiRequest(`${BASE_URL}/api/logout`, {
       method: "POST",
-      credentials: "include",
     });
     if (response.ok) {
       toast.success("Saiu com sucesso");

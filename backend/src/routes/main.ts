@@ -32,14 +32,13 @@ mainRouter.post("/login", async (req: Request, res: Response) => {
     const sessionToken = generateSessionToken();
     const session = await createSession(sessionToken, user.id);
     // Debug log to verify token and expiration
-    console.log("Setting cookie with token:", sessionToken);
-    console.log("Cookie expires at:", session.expiresAt);
 
     setSessionTokenCookie(res, sessionToken, session.expiresAt);
 
     res.status(200).json({
       message: "Login realizado com sucesso",
       user: { id: user.id, username: user.username },
+      token: sessionToken,
     });
   } catch (err) {
     res.status(400).json({ message: `ERRO: ${err}` });
@@ -67,15 +66,24 @@ mainRouter.post("/logout", async (req: Request, res: Response) => {
 // AUTH
 mainRouter.get("/auth", async (req: Request, res: Response) => {
   try {
-    const { sessionToken } = req.cookies;
+    let { sessionToken } = req.cookies;
     if (!sessionToken) {
-      res.status(401).json({ message: "Não autorizado sessionToken" });
+      const authHeader = req.headers.authorization;
+      if (authHeader && authHeader.startsWith("Bearer ")) {
+        sessionToken = authHeader.substring(7);
+      }
+    }
+
+    if (!sessionToken) {
+      res
+        .status(401)
+        .json({ message: "Não autorizado - token não encontrado" });
       return;
     }
 
     const { session, user } = await validateSessionToken(sessionToken);
     if (!session || !user) {
-      res.status(401).json({ message: "Não autorizado session" });
+      res.status(401).json({ message: "Não autorizado - sessão inválida" });
       return;
     }
 

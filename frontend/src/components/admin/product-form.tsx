@@ -16,6 +16,7 @@ import { Tag, TagInput } from "emblor";
 import { Link, useNavigate, useRouter } from "@tanstack/react-router";
 import { BASE_URL } from "@/lib/constants";
 import { toast } from "sonner";
+import { apiRequest } from "@/lib/utils";
 
 type ProductOption = {
   id: number;
@@ -194,24 +195,16 @@ export default function ProductForm({ product, categories }: ProductFormProps) {
 
       let response;
       if (product) {
-        response = await fetch(
+        response = await apiRequest(
           `${BASE_URL}/api/produtos/${product.id}/update`,
           {
             method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            credentials: "include",
             body: JSON.stringify(productData),
           }
         );
       } else {
-        response = await fetch(`${BASE_URL}/api/produtos`, {
+        response = await apiRequest(`${BASE_URL}/api/produtos`, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
           body: JSON.stringify(productData),
         });
       }

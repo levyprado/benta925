@@ -6,6 +6,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import { BASE_URL } from "@/lib/constants";
+import { apiRequest } from "@/lib/utils";
 
 type CategoryFormProps = {
   category?: Category;
@@ -54,24 +55,16 @@ export default function CategoryForm({ category }: CategoryFormProps) {
       // If there is a category PUT, else POST
       let response;
       if (category) {
-        response = await fetch(
+        response = await apiRequest(
           `${BASE_URL}/api/categorias/${category.id}/update`,
           {
             method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            credentials: "include",
             body: JSON.stringify(categoryData),
           }
         );
       } else {
-        response = await fetch(`${BASE_URL}/api/categorias`, {
+        response = await apiRequest(`${BASE_URL}/api/categorias`, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
           body: JSON.stringify(categoryData),
         });
       }

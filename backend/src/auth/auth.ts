@@ -87,17 +87,17 @@ export function setSessionTokenCookie(
   expiresAt: Date
 ): void {
   if (process.env.NODE_ENV === "production") {
-    console.log("Setting production cookie");
     res.cookie("sessionToken", token, {
       httpOnly: true,
-      sameSite: "none",
+      sameSite: "lax",
       secure: true,
       expires: expiresAt,
       path: "/",
       partitioned: true,
     });
+
+    res.setHeader("Authorization", `Bearer ${token}`);
   } else {
-    console.log("Setting development cookie");
     res.cookie("sessionToken", token, {
       httpOnly: true,
       secure: false,
@@ -112,12 +112,14 @@ export function deleteSessionTokenCookie(res: Response): void {
   if (process.env.NODE_ENV === "production") {
     res.cookie("sessionToken", "", {
       httpOnly: true,
-      sameSite: "none",
+      sameSite: "lax",
       maxAge: 0,
       path: "/",
       secure: true,
       partitioned: true,
     });
+
+    res.setHeader("Authorization", "");
   } else {
     res.cookie("sessionToken", "", {
       httpOnly: true,
