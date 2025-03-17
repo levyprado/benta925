@@ -6,12 +6,11 @@ import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { BASE_URL } from "@/lib/constants";
 import { toast } from "sonner";
+import { apiRequest } from "@/lib/utils";
 
 export const Route = createFileRoute("/login")({
   beforeLoad: async () => {
-    const response = await fetch(`${BASE_URL}/api/auth`, {
-      credentials: "include",
-    });
+    const response = await apiRequest(`${BASE_URL}/api/auth`);
     if (response.ok) {
       throw redirect({ to: "/admin" });
     }
