@@ -6,6 +6,7 @@ import {
   useEffect,
 } from "react";
 import { BASE_URL } from "@/lib/constants";
+import { apiRequest } from "@/lib/utils";
 
 type User = {
   id: number;
@@ -28,7 +29,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const fetchUser = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch(`${BASE_URL}/api/auth`, {
+      const response = await apiRequest(`${BASE_URL}/api/auth`, {
         credentials: "include",
       });
 

@@ -93,7 +93,6 @@ export function setSessionTokenCookie(
       secure: true,
       expires: expiresAt,
       path: "/",
-      partitioned: true,
     });
 
     res.setHeader("Authorization", `Bearer ${token}`);
@@ -116,7 +115,6 @@ export function deleteSessionTokenCookie(res: Response): void {
       maxAge: 0,
       path: "/",
       secure: true,
-      partitioned: true,
     });
 
     res.setHeader("Authorization", "");
