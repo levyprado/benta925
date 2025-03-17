@@ -5,6 +5,14 @@ import { ShoppingCartIcon, XIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { formatPrice } from "@/lib/utils";
 import { useCart } from "@/context/hooks/use-cart";
+import { Label } from "./ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
 
 type ProductDialogProps = {
   product: Product | null;
@@ -19,24 +27,53 @@ export default function ProductDialog({
 }: ProductDialogProps) {
   const { addItem } = useCart();
   const [localProduct, setLocalProduct] = useState<Product | null>(null);
+  const [selectedOptions, setSelectedOptions] = useState<
+    Record<string, string>
+  >({});
+  const [validationErrors, setValidationErrors] = useState<
+    Record<string, boolean>
+  >({});
 
   useEffect(() => {
     if (open && product) {
       setLocalProduct(product);
+      setSelectedOptions({});
+      setValidationErrors({});
     }
   }, [open, product]);
 
+  const handleAddToCart = () => {
+    if (!localProduct) return;
+
+    if (localProduct.opcoes && localProduct.opcoes.length > 0) {
+      const newValidationErrors: Record<string, boolean> = {};
+      let hasErrors = false;
+
+      localProduct.opcoes.forEach((option) => {
+        if (!selectedOptions[option.nome]) {
+          newValidationErrors[option.nome] = true;
+          hasErrors = true;
+        }
+      });
+
+      if (hasErrors) {
+        setValidationErrors(newValidationErrors);
+        return;
+      }
+    }
+
+    addItem(
+      localProduct,
+      Object.keys(selectedOptions).length > 0 ? selectedOptions : undefined
+    );
+    handleClose();
+  };
+
   const handleClose = () => {
     onClose();
-
     setTimeout(() => {
       setLocalProduct(null);
     }, 250);
-  };
-
-  const handleAddToCart = () => {
-    if (localProduct) addItem(localProduct);
-    handleClose();
   };
 
   return (
@@ -46,8 +83,14 @@ export default function ProductDialog({
         onOpenChange={(isOpen) => !isOpen && handleClose()}
       >
         <Dialog.Portal>
-          <Dialog.Backdrop className="fixed inset-0 bg-black opacity-70 transition-all ease-out duration-250 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0" />
-          <Dialog.Popup className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gray-50 w-11/12 max-w-[500px] rounded-lg overflow-hidden transition-all ease-out duration-250 data-[ending-style]:scale-95 data-[ending-style]:opacity-0 data-[starting-style]:scale-95 data-[starting-style]:opacity-0">
+          <Dialog.Backdrop
+            className="fixed inset-0 bg-black opacity-70 transition-all ease-out duration-250 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0"
+            style={{ zIndex: 49 }}
+          />
+          <Dialog.Popup
+            className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gray-50 w-11/12 max-w-[500px] rounded-lg overflow-hidden transition-all ease-out duration-250 data-[ending-style]:scale-95 data-[ending-style]:opacity-0 data-[starting-style]:scale-95 data-[starting-style]:opacity-0"
+            style={{ zIndex: 50 }}
+          >
             {/* Product Image */}
             <div className="aspect-square relative">
               <Button
@@ -73,6 +116,47 @@ export default function ProductDialog({
                   {formatPrice(localProduct?.preco || 0)}
                 </Dialog.Description>
               </div>
+
+              {localProduct?.opcoes && localProduct.opcoes.length > 0 && (
+                <div className="space-y-4 mb-6">
+                  {localProduct.opcoes.map((option) => (
+                    <div key={option.nome} className="flex flex-col gap-2">
+                      <Label htmlFor={option.nome}>{option.nome}</Label>
+                      <Select
+                        value={selectedOptions[option.nome] || ""}
+                        onValueChange={(value) => {
+                          setSelectedOptions((prev) => ({
+                            ...prev,
+                            [option.nome]: value,
+                          }));
+                          setValidationErrors((prev) => ({
+                            ...prev,
+                            [option.nome]: false,
+                          }));
+                        }}
+                      >
+                        <SelectTrigger id={option.nome}>
+                          <SelectValue
+                            placeholder={`Selecione ${option.nome.toLowerCase()}`}
+                          />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {option.valores.map((valor) => (
+                            <SelectItem key={valor} value={valor}>
+                              {valor}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {validationErrors[option.nome] && (
+                        <p className="text-red-600 text-xs">
+                          Por favor, selecione {option.nome.toLowerCase()}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
 
               <div className="mt-6">
                 <Button

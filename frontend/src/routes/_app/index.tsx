@@ -1,10 +1,16 @@
 import ProductList from "@/components/product-list";
-import { getProducts } from "@/lib/queries";
+import { getCategories, getProducts } from "@/lib/queries";
 import { createFileRoute } from "@tanstack/react-router";
 import { Loader2Icon } from "lucide-react";
 
 export const Route = createFileRoute("/_app/")({
-  loader: getProducts,
+  loader: async () => {
+    const [products, categories] = await Promise.all([
+      getProducts(),
+      getCategories(),
+    ]);
+    return { products, categories };
+  },
   component: Home,
   staleTime: 60_000, // 1 minute
   pendingMs: 1000,
@@ -16,12 +22,12 @@ export const Route = createFileRoute("/_app/")({
 });
 
 function Home() {
-  const products = Route.useLoaderData();
+  const { products, categories } = Route.useLoaderData();
 
   return (
     <main className="min-h-[calc(100dvh-65px)] bg-gray-50">
       <div className="container mx-auto px-2 sm:px-4 py-8">
-        <ProductList products={products} />
+        <ProductList products={products} categories={categories} />
       </div>
     </main>
   );

@@ -119,7 +119,9 @@ mainRouter.get("/auth", async (req: Request, res: Response) => {
 // PRODUTOS
 mainRouter.get("/produtos", async (req: Request, res: Response) => {
   try {
-    const produtos = await prisma.produto.findMany();
+    const produtos = await prisma.produto.findMany({
+      include: { opcoes: true },
+    });
     res.status(200).json(produtos);
   } catch (err) {
     res.status(400).json({ message: `ERRO: ${err}` });

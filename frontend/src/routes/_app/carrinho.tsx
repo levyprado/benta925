@@ -24,17 +24,14 @@ function Cart() {
           </Button>
         </div>
         {items.length > 0 ? (
-          // Cart items
           <div className="grid gap-8 lg:grid-cols-3">
-            {/* Cart list */}
             <div className="lg:col-span-2">
               <ul className="border border-gray-200 rounded-lg bg-white">
                 {items.map((item) => (
                   <li
-                    key={item.id}
+                    key={`${item.id}-${JSON.stringify(item.selectedOptions)}`}
                     className="flex items-center gap-4 border-b border-gray-200 p-4 last:border-0"
                   >
-                    {/* Image */}
                     <div className="size-22 shrink-0 overflow-hidden rounded-md border border-gray-200 sm:size-24">
                       <img
                         src={item.imagem}
@@ -42,19 +39,26 @@ function Cart() {
                         className="size-full object-cover"
                       />
                     </div>
-                    {/* Details */}
                     <div className="flex-1 flex flex-col">
                       <h3 className="text-sm leading-tight font-medium text-gray-900 sm:text-base">
                         {item.nome}
                       </h3>
+                      {item.selectedOptions && Object.entries(item.selectedOptions).length > 0 && (
+                        <div className="mt-1 space-y-0.5">
+                          {Object.entries(item.selectedOptions).map(([option, value]) => (
+                            <p key={option} className="text-xs text-gray-500">
+                              <span className="font-medium">{option}:</span> {value}
+                            </p>
+                          ))}
+                        </div>
+                      )}
                       <p className="mt-1 text-sm font-medium text-gray-500 sm:text-base">
                         {formatPrice(item.preco)}
                       </p>
                     </div>
-                    {/* Actions */}
                     <div className="flex items-center gap-2">
                       <Button
-                        onClick={() => removeItem(item.id)}
+                        onClick={() => removeItem(item.id, item.selectedOptions)}
                         variant="ghost"
                         size="icon"
                       >
@@ -65,22 +69,31 @@ function Cart() {
                 ))}
               </ul>
             </div>
-            {/* Cart summary */}
             <div className="p-6 h-fit rounded-lg border border-gray-200 bg-white">
               <h2 className="text-xl font-semibold">Resumo do pedido</h2>
-
               <ul className="mt-4 space-y-1.5">
                 {items.map((item) => (
                   <li
-                    key={`summary-${item.id}`}
-                    className="flex items-center justify-between"
+                    key={`summary-${item.id}-${JSON.stringify(item.selectedOptions)}`}
+                    className="space-y-0.5"
                   >
-                    <span className="text-sm text-gray-900 line-clamp-1">
-                      {item.nome}
-                    </span>
-                    <span className="text-sm text-gray-600">
-                      {formatPrice(item.preco)}
-                    </span>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-900 line-clamp-1">
+                        {item.nome}
+                      </span>
+                      <span className="text-sm text-gray-600">
+                        {formatPrice(item.preco)}
+                      </span>
+                    </div>
+                    {item.selectedOptions && Object.entries(item.selectedOptions).length > 0 && (
+                      <div className="flex flex-wrap gap-x-2">
+                        {Object.entries(item.selectedOptions).map(([option, value]) => (
+                          <p key={option} className="text-xs text-gray-500">
+                            {value}
+                          </p>
+                        ))}
+                      </div>
+                    )}
                   </li>
                 ))}
               </ul>

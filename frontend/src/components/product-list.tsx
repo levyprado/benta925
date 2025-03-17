@@ -1,21 +1,135 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ProductDialog from "./product-dialog";
-import { Product } from "@/lib/types";
+import { Category, Product } from "@/lib/types";
 import { formatPrice } from "@/lib/utils";
+import SearchInput from "./admin/search-input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
 
-export default function ProductList({ products }: { products: Product[] }) {
+export default function ProductList({
+  products,
+  categories,
+}: {
+  products: Product[];
+  categories: Category[];
+}) {
   const [activeProduct, setActiveProduct] = useState<Product | null>(null);
 
-  const sortedProducts = products.sort((a, b) => {
-    if (a.disponivel && !b.disponivel) return -1;
-    if (!a.disponivel && b.disponivel) return 1;
-    return a.nome.localeCompare(b.nome);
-  });
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [sortOption, setSortOption] = useState<string>("");
+  const [filteredProducts, setFilteredProducts] = useState(products);
+
+  useEffect(() => {
+    let result = [...products];
+
+    // Apply category filter
+    if (selectedCategory && selectedCategory !== "all") {
+      result = result.filter(
+        (product) => product.categoriaId.toString() === selectedCategory
+      );
+    }
+
+    // Apply search filter
+    if (searchTerm) {
+      const searchLower = searchTerm.toLowerCase();
+      result = result.filter((product) =>
+        product.nome.toLowerCase().includes(searchLower)
+      );
+    }
+
+    // Apply sorting
+    switch (sortOption) {
+      case "price-asc":
+        result.sort((a, b) => a.preco - b.preco);
+        break;
+      case "price-desc":
+        result.sort((a, b) => b.preco - a.preco);
+        break;
+      case "name-asc":
+        result.sort((a, b) => a.nome.localeCompare(b.nome));
+        break;
+      case "name-desc":
+        result.sort((a, b) => b.nome.localeCompare(a.nome));
+        break;
+      default:
+        // Default sorting (no change)
+        break;
+    }
+
+    result.sort((a, b) => {
+      if (a.disponivel && !b.disponivel) return -1;
+      if (!a.disponivel && b.disponivel) return 1;
+      return 0;
+    });
+
+    setFilteredProducts(result);
+  }, [products, searchTerm, selectedCategory, sortOption]);
 
   return (
     <>
+      {/* Search and filter section */}
+      <div className="mb-6 flex flex-col gap-2">
+        <SearchInput
+          searchValue={searchTerm}
+          setSearchValue={setSearchTerm}
+          placeholder="Buscar produtos..."
+        />
+
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            {/* <FilterIcon className="size-4" /> */}
+            <Select
+              value={selectedCategory}
+              onValueChange={setSelectedCategory}
+            >
+              <SelectTrigger id="category" className="w-36">
+                <SelectValue placeholder="Categorias" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todas</SelectItem>
+                {categories.map((category) => (
+                  <SelectItem key={category.id} value={category.id.toString()}>
+                    {category.nome}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex items-center gap-2">
+            {/* <ArrowUpDown className="size-5" /> */}
+            <Select value={sortOption} onValueChange={setSortOption}>
+              <SelectTrigger id="sort" className="w-36">
+                <SelectValue placeholder="Ordenar" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="default">Padrão</SelectItem>
+                <SelectItem value="price-asc">Menor preço</SelectItem>
+                <SelectItem value="price-desc">Maior preço</SelectItem>
+                <SelectItem value="name-asc">Nome (A-Z)</SelectItem>
+                <SelectItem value="name-desc">Nome (Z-A)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {/* Results count */}
+        <div className="text-sm text-gray-500">
+          {filteredProducts.length}{" "}
+          {filteredProducts.length === 1
+            ? "produto encontrado"
+            : "produtos encontrados"}
+        </div>
+      </div>
+
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-3 gap-y-6 lg:gap-x-4 lg:gap-y-8">
-        {sortedProducts.map((product) => (
+        {filteredProducts.map((product) => (
           <button
             key={product.id}
             onClick={() => setActiveProduct(product)}

@@ -25,5 +25,5 @@ app.use("/api", mainRouter);
 app.use("/api/vendas", vendasRouter);
 
 app.listen(process.env.PORT || 5000, () => {
-  console.log(`Servidor rodando em ${process.env.BASE_URL}`);
+  console.log(`Servidor rodando em ${process.env.FRONTEND_URL}`);
 });

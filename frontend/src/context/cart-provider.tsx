@@ -6,8 +6,12 @@ import { CheckCircle2Icon, XCircleIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "@tanstack/react-router";
 
+export type CartItem = Product & {
+  selectedOptions?: Record<string, string>;
+};
+
 export function CartProvider({ children }: { children: React.ReactNode }) {
-  const [items, setItems] = useState<Product[]>(() => {
+  const [items, setItems] = useState<CartItem[]>(() => {
     const savedCart = localStorage.getItem("carrinho");
     if (savedCart) {
       return JSON.parse(savedCart);
@@ -21,10 +25,22 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem("carrinho", JSON.stringify(items));
   }, [items]);
 
-  const addItem = (product: Product) => {
+  const addItem = (
+    product: Product,
+    selectedOptions?: Record<string, string>
+  ) => {
     setItems((prevItems) => {
-      // Check if product already exist in the cart
-      const existingItem = prevItems.find((item) => item.id === product.id);
+      // Check if product with same options exists
+      const existingItem = prevItems.find((item) => {
+        if (item.id !== product.id) return false;
+        if (!selectedOptions && !item.selectedOptions) return true;
+
+        // Compare selected options
+        return (
+          JSON.stringify(item.selectedOptions) ===
+          JSON.stringify(selectedOptions)
+        );
+      });
 
       if (existingItem) {
         toast(
@@ -39,6 +55,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         );
         return prevItems;
       } else {
+        const newItem: CartItem = {
+          ...product,
+          selectedOptions,
+        };
         toast(
           <div className="flex-1 flex items-center font-sans">
             <div className="w-full space-y-1">
@@ -63,14 +83,31 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             </div>
           </div>
         );
-        return [...prevItems, product];
+        return [...prevItems, newItem];
       }
     });
   };
 
-  const removeItem = (productId: number) => {
-    setItems((prevItems) => prevItems.filter((item) => item.id !== productId));
+  const removeItem = (
+    productId: number,
+    selectedOptions?: Record<string, string>
+  ) => {
+    setItems((prevItems) =>
+      prevItems.filter((item) => {
+        if (item.id !== productId) return true;
 
+        // If no options were provided for removal or item has no options, remove the item
+        if (!selectedOptions && !item.selectedOptions) return false;
+
+        // Keep item if options don't match
+        return (
+          JSON.stringify(item.selectedOptions) !==
+          JSON.stringify(selectedOptions)
+        );
+      })
+    );
+
+    // Check if cart is empty after removal
     if (items.length === 0) localStorage.removeItem("carrinho");
   };
 

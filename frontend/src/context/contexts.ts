@@ -1,11 +1,15 @@
 import { Product } from "@/lib/types";
 import { createContext } from "react";
+import { CartItem } from "./cart-provider";
 
 // CART
 type CartContextType = {
-  items: Product[];
-  addItem: (product: Product) => void;
-  removeItem: (productId: number) => void;
+  items: CartItem[];
+  addItem: (product: Product, selectedOptions?: Record<string, string>) => void;
+  removeItem: (
+    productId: number,
+    selectedOptions?: Record<string, string>
+  ) => void;
   total: number;
 };
 export const CartContext = createContext<CartContextType | undefined>(
