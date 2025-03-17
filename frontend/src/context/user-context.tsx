@@ -29,9 +29,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const fetchUser = async () => {
     try {
       setIsLoading(true);
-      const response = await apiRequest(`${BASE_URL}/api/auth`, {
-        credentials: "include",
-      });
+      const response = await apiRequest(`${BASE_URL}/api/auth`);
 
       if (!response.ok) {
         setIsAuthenticated(false);
