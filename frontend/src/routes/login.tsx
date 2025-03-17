@@ -91,7 +91,7 @@ function LoginPage() {
   };
 
   return (
-    <main className="bg-gray-50 min-h-screen grid place-content-center px-4">
+    <main className="bg-gray-50 min-h-dvh grid place-content-center px-4">
       <form
         onSubmit={handleSubmit}
         className="bg-white border border-gray-200 rounded-lg shadow-xs p-6 space-y-4"

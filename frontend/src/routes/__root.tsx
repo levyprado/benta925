@@ -7,7 +7,7 @@ export const Route = createRootRoute({
   component: RootComponent,
   notFoundComponent: () => {
     return (
-      <div className="bg-gray-50 min-h-screen grid place-content-center">
+      <div className="bg-gray-50 min-h-dvh grid place-content-center">
         <div className="flex flex-col items-center gap-6">
           <img src="/logo.png" alt="Logo benta" className="w-40" />
           <h1 className="text-2xl font-bold">Página não encontrada</h1>

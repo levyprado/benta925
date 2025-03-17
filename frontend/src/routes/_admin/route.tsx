@@ -20,7 +20,7 @@ function AdminLayout() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
+      <div className="min-h-dvh flex flex-col items-center justify-center bg-gray-50">
         <div className="size-8 border-4 border-gray-300 border-t-gray-500 rounded-full animate-spin"></div>
         <span className="ml-3">Verificando autenticação...</span>
       </div>
@@ -33,7 +33,7 @@ function AdminLayout() {
 
   return (
     <DeleteDialogProvider>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-dvh bg-gray-50">
         <div className="flex h-full">
           <AdminSidebar />
           <div className="flex-1 flex flex-col">
