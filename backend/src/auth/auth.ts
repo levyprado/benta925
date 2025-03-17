@@ -111,7 +111,7 @@ export function deleteSessionTokenCookie(res: Response): void {
   if (process.env.NODE_ENV === "production") {
     res.cookie("sessionToken", "", {
       httpOnly: true,
-      sameSite: "lax",
+      sameSite: "none",
       maxAge: 0,
       path: "/",
       secure: true,
@@ -121,7 +121,7 @@ export function deleteSessionTokenCookie(res: Response): void {
   } else {
     res.cookie("sessionToken", "", {
       httpOnly: true,
-      sameSite: "lax",
+      sameSite: "none",
       maxAge: 0,
       secure: false,
       path: "/",
