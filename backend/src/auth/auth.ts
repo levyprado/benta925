@@ -94,6 +94,7 @@ export function setSessionTokenCookie(
       secure: true,
       expires: expiresAt,
       path: "/",
+      partitioned: true,
     });
   } else {
     console.log("Setting development cookie");
@@ -115,6 +116,7 @@ export function deleteSessionTokenCookie(res: Response): void {
       maxAge: 0,
       path: "/",
       secure: true,
+      partitioned: true,
     });
   } else {
     res.cookie("sessionToken", "", {

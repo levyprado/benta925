@@ -83,7 +83,7 @@ model ItemVenda {
   id        Int      @id @default(autoincrement())
   venda     Venda    @relation(fields: [vendaId], references: [id], onDelete: Cascade)
   vendaId   Int
-  produto   Produto  @relation(fields: [produtoId], references: [id])
+  produto   Produto  @relation(fields: [produtoId], references: [id], onDelete: Cascade)
   produtoId Int
   preco     Int
   createdAt DateTime @default(now())
