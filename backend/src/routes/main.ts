@@ -47,11 +47,27 @@ mainRouter.post("/login", async (req: Request, res: Response) => {
 
 mainRouter.post("/logout", async (req: Request, res: Response) => {
   try {
-    const { sessionToken } = req.cookies;
-    if (!sessionToken) return;
+    let { sessionToken } = req.cookies;
+
+    if (!sessionToken) {
+      const authHeader = req.headers.authorization;
+      if (authHeader && authHeader.startsWith("Bearer ")) {
+        sessionToken = authHeader.substring(7);
+        console.log("Logging out using token from Authorization header");
+      }
+    }
+
+    if (!sessionToken) {
+      res.status(400).json({ message: "Nenhum token encontrado para logout" });
+      return;
+    }
 
     const { session } = await validateSessionToken(sessionToken);
-    if (!session) return;
+    if (!session) {
+      deleteSessionTokenCookie(res);
+      res.status(200).json({ message: "Sessão já inválida ou expirada" });
+      return;
+    }
     await invalidateSession(session.id);
     deleteSessionTokenCookie(res);
     res.status(200).json({ message: "Logout realizado com sucesso" });

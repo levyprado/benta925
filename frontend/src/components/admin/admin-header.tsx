@@ -22,6 +22,9 @@ export default function AdminHeader() {
     const response = await apiRequest(`${BASE_URL}/api/logout`, {
       method: "POST",
     });
+
+    localStorage.removeItem("authToken");
+
     if (response.ok) {
       toast.success("Saiu com sucesso");
       window.location.href = "/login";
