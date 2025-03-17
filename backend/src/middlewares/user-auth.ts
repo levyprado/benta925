@@ -17,9 +17,20 @@ export const userAuth = async (
         return;
       }
     }
-    const { sessionToken } = req.cookies;
+    let { sessionToken } = req.cookies;
+
     if (!sessionToken) {
-      res.status(401).json({ message: "Não autorizado" });
+      const authHeader = req.headers.authorization;
+      if (authHeader && authHeader.startsWith("Bearer ")) {
+        sessionToken = authHeader.substring(7);
+        console.log("Using token from Authorization header");
+      }
+    }
+
+    if (!sessionToken) {
+      res
+        .status(401)
+        .json({ message: "Não autorizado - token não encontrado" });
       return;
     }
     const { session, user } = await validateSessionToken(sessionToken);
