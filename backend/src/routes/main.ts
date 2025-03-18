@@ -128,6 +128,38 @@ mainRouter.get("/produtos", async (req: Request, res: Response) => {
   }
 });
 
+mainRouter.get("/products", async (req, res) => {
+  try {
+    const { ids } = req.query;
+
+    // Validate the ids parameter
+    if (!ids) {
+      res.status(400).json({ error: "IDs dos produtos são necessários" });
+      return;
+    }
+
+    // Convert comma-separated string to array of numbers
+    const productIds = String(ids)
+      .split(",")
+      .map((id) => parseInt(id.trim()))
+      .filter((id) => !isNaN(id));
+
+    if (productIds.length === 0) {
+      res.status(400).json({ error: "IDs inválidos" });
+      return;
+    }
+
+    // Fetch products from database
+    const products = await prisma.produto.findMany({
+      where: { id: { in: productIds } },
+    });
+
+    res.status(200).json(products);
+  } catch (err) {
+    res.status(400).json({ message: `ERRO: ${err}` });
+  }
+});
+
 mainRouter.post("/produtos", userAuth, async (req: Request, res: Response) => {
   try {
     const { nome, preco, imagem, categoriaId, disponivel, opcoes } = req.body;

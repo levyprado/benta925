@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { CheckCircle2Icon, XCircleIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "@tanstack/react-router";
+import { BASE_URL } from "@/lib/constants";
 
 export type CartItem = Product & {
   selectedOptions?: Record<string, string>;
@@ -24,6 +25,48 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     localStorage.setItem("carrinho", JSON.stringify(items));
   }, [items]);
+
+  const removeUnavailableProducts = async () => {
+    const productIds = items.map((item) => item.id);
+
+    if (productIds.length === 0) return;
+
+    try {
+      const response = await fetch(
+        `${BASE_URL}/api/products?ids=${productIds.join(",")}`
+      );
+      if (!response.ok) throw new Error("Erro ao buscar produtos");
+
+      const currentProducts: Product[] = await response.json();
+
+      const availabilityMap = currentProducts.reduce(
+        (map, product) => {
+          map[product.id] = product.disponivel;
+          return map;
+        },
+        {} as Record<number, boolean>
+      );
+
+      const updatedItems = items.filter((item) => {
+        const isAvailable = availabilityMap[item.id] !== false;
+
+        if (!isAvailable) {
+          toast.info(`${item.nome} foi removido do carrinho pois foi esgotado`);
+        }
+        return isAvailable;
+      });
+
+      if (updatedItems.length !== items.length) {
+        setItems(updatedItems);
+      }
+    } catch (err) {
+      console.error(`Erro checando produtos indisponíveis: ${err}`);
+    }
+  };
+
+  useEffect(() => {
+    removeUnavailableProducts();
+  }, []);
 
   const addItem = (
     product: Product,

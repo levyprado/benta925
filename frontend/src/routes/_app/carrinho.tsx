@@ -11,6 +11,45 @@ export const Route = createFileRoute("/_app/carrinho")({
 function Cart() {
   const { items, removeItem, total } = useCart();
 
+  const handleCheckout = () => {
+    const phoneNumber = "5565992775467";
+
+    let message = "🩶 *Novo Pedido Benta*\n\n";
+
+    // Adicionar itens do carrinho
+    message += "*Itens do Pedido:*\n";
+    items.forEach((item, index) => {
+      message += `${index + 1}. *${item.nome}* - ${formatPrice(item.preco)}\n`;
+
+      // Adicionar opções selecionadas, se houver
+      if (
+        item.selectedOptions &&
+        Object.entries(item.selectedOptions).length > 0
+      ) {
+        message += "   *Opções:* ";
+        Object.entries(item.selectedOptions).forEach(
+          ([option, value], i, arr) => {
+            message += `${option}: ${value}${i < arr.length - 1 ? ", " : ""}`;
+          }
+        );
+        message += "\n";
+      }
+    });
+
+    // Adicionar total
+    message += `\n*Total do Pedido:* ${formatPrice(total)}\n\n`;
+    message += "Por favor, confirme meu pedido. Obrigado!";
+
+    // Codificar a mensagem para URL
+    const encodedMessage = encodeURIComponent(message);
+
+    // Criar URL do WhatsApp
+    const whatsappUrl = `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodedMessage}`;
+
+    // Abrir WhatsApp em uma nova janela
+    window.open(whatsappUrl, "_blank");
+  };
+
   return (
     <main className="bg-gray-50 min-h-[calc(100dvh-65px)]">
       <div className="container mx-auto px-4 py-8">
@@ -43,22 +82,31 @@ function Cart() {
                       <h3 className="text-sm leading-tight font-medium text-gray-900 sm:text-base">
                         {item.nome}
                       </h3>
-                      {item.selectedOptions && Object.entries(item.selectedOptions).length > 0 && (
-                        <div className="mt-1 space-y-0.5">
-                          {Object.entries(item.selectedOptions).map(([option, value]) => (
-                            <p key={option} className="text-xs text-gray-500">
-                              <span className="font-medium">{option}:</span> {value}
-                            </p>
-                          ))}
-                        </div>
-                      )}
+                      {item.selectedOptions &&
+                        Object.entries(item.selectedOptions).length > 0 && (
+                          <div className="mt-1 space-y-0.5">
+                            {Object.entries(item.selectedOptions).map(
+                              ([option, value]) => (
+                                <p
+                                  key={option}
+                                  className="text-xs text-gray-500"
+                                >
+                                  <span className="font-medium">{option}:</span>{" "}
+                                  {value}
+                                </p>
+                              )
+                            )}
+                          </div>
+                        )}
                       <p className="mt-1 text-sm font-medium text-gray-500 sm:text-base">
                         {formatPrice(item.preco)}
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
                       <Button
-                        onClick={() => removeItem(item.id, item.selectedOptions)}
+                        onClick={() =>
+                          removeItem(item.id, item.selectedOptions)
+                        }
                         variant="ghost"
                         size="icon"
                       >
@@ -85,15 +133,18 @@ function Cart() {
                         {formatPrice(item.preco)}
                       </span>
                     </div>
-                    {item.selectedOptions && Object.entries(item.selectedOptions).length > 0 && (
-                      <div className="flex flex-wrap gap-x-2">
-                        {Object.entries(item.selectedOptions).map(([option, value]) => (
-                          <p key={option} className="text-xs text-gray-500">
-                            {value}
-                          </p>
-                        ))}
-                      </div>
-                    )}
+                    {item.selectedOptions &&
+                      Object.entries(item.selectedOptions).length > 0 && (
+                        <div className="flex flex-wrap gap-x-2">
+                          {Object.entries(item.selectedOptions).map(
+                            ([option, value]) => (
+                              <p key={option} className="text-xs text-gray-500">
+                                {value}
+                              </p>
+                            )
+                          )}
+                        </div>
+                      )}
                   </li>
                 ))}
               </ul>
@@ -106,6 +157,7 @@ function Cart() {
                   </span>
                 </div>
                 <Button
+                  onClick={handleCheckout}
                   size="lg"
                   className="w-full bg-gray-500 hover:bg-gray-600"
                 >
