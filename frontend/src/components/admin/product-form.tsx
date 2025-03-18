@@ -178,7 +178,11 @@ export default function ProductForm({ product, categories }: ProductFormProps) {
         );
         const cloudinaryResult = await cloudinaryResponse.json();
 
-        imageUrl = cloudinaryResult.secure_url;
+        // Apply transformations to the URL
+        const baseUrl =
+          cloudinaryResult.secure_url.split("/upload/")[0] + "/upload/";
+        const imagePath = cloudinaryResult.secure_url.split("/upload/")[1];
+        imageUrl = `${baseUrl}q_auto,f_auto,c_limit,w_1000,h_1000/${imagePath}`;
       }
 
       const productData = {

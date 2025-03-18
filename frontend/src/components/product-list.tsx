@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ProductDialog from "./product-dialog";
 import { Category, Product } from "@/lib/types";
-import { formatPrice } from "@/lib/utils";
+import { cn, formatPrice } from "@/lib/utils";
 import SearchInput from "./admin/search-input";
 import {
   Select,
@@ -11,6 +11,10 @@ import {
   SelectValue,
 } from "./ui/select";
 
+const ImagePlaceholder = () => (
+  <div className="bg-gray-100 animate-pulse size-full absolute inset-0"></div>
+);
+
 export default function ProductList({
   products,
   categories,
@@ -19,12 +23,55 @@ export default function ProductList({
   categories: Category[];
 }) {
   const [activeProduct, setActiveProduct] = useState<Product | null>(null);
+  const [imagesLoaded, setImagesLoaded] = useState<Record<number, boolean>>({});
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [sortOption, setSortOption] = useState<string>("");
   const [filteredProducts, setFilteredProducts] = useState(products);
 
+  // Intersection Observer
+  useEffect(() => {
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const img = entry.target as HTMLImageElement;
+            const productId = Number(img.dataset.productId);
+
+            // Set the src attribute from data-src when in viewport
+            if (img.dataset.src) {
+              img.src = img.dataset.src;
+
+              // Handle image load event
+              img.onload = () => {
+                setImagesLoaded((prev) => ({
+                  ...prev,
+                  [productId]: true,
+                }));
+
+                // Stop observing this image
+                observerRef.current?.unobserve(img);
+              };
+            }
+          }
+        });
+      },
+      {
+        rootMargin: "200px 0px",
+        threshold: 0.01,
+      }
+    );
+
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
+  }, []);
+
+  // Filtering
   useEffect(() => {
     let result = [...products];
 
@@ -69,7 +116,14 @@ export default function ProductList({
     });
 
     setFilteredProducts(result);
+    setImagesLoaded({});
   }, [products, searchTerm, selectedCategory, sortOption]);
+
+  const handleImageRef = (node: HTMLImageElement | null) => {
+    if (node && observerRef.current) {
+      observerRef.current.observe(node);
+    }
+  };
 
   return (
     <>
@@ -137,10 +191,17 @@ export default function ProductList({
             className="group text-start grid grid-rows-subgrid row-span-3 group relative overflow-hidden rounded-lg border border-gray-200 bg-white transition-all hover:shadow-md cursor-pointer gap-2 pb-2 outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/70 focus-visible:ring-offset-2 "
           >
             <div className="aspect-square overflow-hidden relative">
+              {!imagesLoaded[product.id] && <ImagePlaceholder />}
               <img
-                src={product.imagem}
+                ref={(node) => handleImageRef(node)}
+                data-src={product.imagem}
+                data-product-id={product.id}
+                src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
                 alt={product.nome}
-                className="size-full object-cover transition-transform group-hover:scale-105 group-disabled:opacity-70"
+                className={cn(
+                  "size-full object-cover transition-transform group-hover:scale-105 group-disabled:opacity-70",
+                  imagesLoaded[product.id] ? "opacity-100" : "opacity-0"
+                )}
               />
               {!product.disponivel && (
                 <div className="absolute inset-0 flex items-end justify-center">
