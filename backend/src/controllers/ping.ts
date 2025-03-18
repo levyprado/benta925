@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
 
 export const ping = (req: Request, res: Response) => {
-  res.json({ pong: true });
+  res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
 };

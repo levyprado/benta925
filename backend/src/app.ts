@@ -4,6 +4,7 @@ import { mainRouter } from "./routes/main";
 import cookieParser from "cookie-parser";
 import { vendasRouter } from "./routes/vendas";
 import dotenv from "dotenv";
+import "./utils/keep-alive";
 
 dotenv.config();
 
@@ -25,5 +26,5 @@ app.use("/api", mainRouter);
 app.use("/api/vendas", vendasRouter);
 
 app.listen(process.env.PORT || 5000, () => {
-  console.log(`Servidor rodando em ${process.env.FRONTEND_URL}`);
+  console.log(`Servidor rodando em ${process.env.BACKEND_URL}`);
 });
